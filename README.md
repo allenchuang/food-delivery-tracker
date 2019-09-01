@@ -1,5 +1,8 @@
 # food-delivery-tracker
 
+```npm i``` on root and client folder
+
+
 To start server run:
 
 ```node app.js```

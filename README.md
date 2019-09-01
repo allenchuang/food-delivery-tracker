@@ -4,13 +4,14 @@ To start server run:
 
 ```node app.js```
 
-Server will be on localhost:4001
+
+Server will be on [http://localhost:4001](http://localhost:4001)
 
 To start client:
 
 ```cd client```
 ```npm start```
 
-Client will be on localhost:3000
+Client will be on [http://localhost:3000](http://localhost:3000)
 
 

@@ -20,17 +20,18 @@ const io = socketIo(server, {
 const data = JSON.parse(contents);
 
 // Starting Socket server
-let sec = 0, interval;
 io.on("connection", socket => {
   console.log("New client connected");
+  let sec = 0, interval;
   if (typeof(interval) === 'undefined') {
     interval = setInterval(function() {
       sec++;
-      let events = data.filter( i => i.sent_at_second === sec); 
-      console.log(events);
-      io.sockets.emit('FromAPI', events, sec );
-    }, 1000);  
-    // clearInterval(interval);
+      let events = data.filter( i => i.sent_at_second === sec);       
+      for ( event of events ) {
+        io.sockets.emit('FromAPI', event , sec );
+        console.log(event);
+      }
+    }, 1000);
   }
 
   socket.on('Status Change', (id, order) => {
@@ -46,6 +47,7 @@ io.on("connection", socket => {
 
 
   socket.on("disconnect", () => {  
+    clearInterval(interval);
     console.log("Client disconnected");
   });
 });

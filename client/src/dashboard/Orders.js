@@ -48,7 +48,7 @@ export default function Orders(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {feed.sort( (a,b) => b.sent_at_second - a.sent_at_second).map(row => (
+          {feed.map(row => (
             <TableRow key={row.id}>
               <TableCell>{row.id}</TableCell>
               <TableCell>{row.name}</TableCell>

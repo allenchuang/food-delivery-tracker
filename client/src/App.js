@@ -132,16 +132,33 @@ class App extends Component {
       activeOrders: [],
       inactiveOrders: [],
       endpoint: "http://127.0.0.1:4001",
-      timeElapsed: 0,
       navOpen: true,
     };
+    this.timeElapsed = 0;
+    this.socket = socketIOClient(this.state.endpoint);
+    this.orders = [
+      
+    ];
+    this.orderStatusMap = {}
   }
   componentDidMount() {
-    const { endpoint } = this.state;
-    const socket = socketIOClient(endpoint);
+    const { orders, timeElapsed, socket, state: { endpoint }} = this;
     socket.on("FromAPI", (data, sec) => {
-      this.sortFeed(data, sec);
-    });    
+      orders.push(data);
+      // timeElapsed = sec;
+      this.updateOrderStatusMap(data);
+      this.setState( { ...this.state, response: orders });
+    }); 
+  }
+  
+  updateOrderStatusMap = (data) => {
+      this.orderStatusMap[data.id] = data.event_name;
+      console.log(this.orderStatusMap);
+  }
+
+  componentWillUnmount() {
+    // close sockets
+    this.socket.close();
   }
 
   handleDrawerOpen = () => {
@@ -174,43 +191,43 @@ class App extends Component {
     // return list.some( order => order.id  === id);
   }
 
-  sortFeed = async (data, sec) => {
-    const {activeOrders, inactiveOrders, response} = this.state;
+  // sortFeed = async (sec) => {
+  //   const {activeOrders, inactiveOrders, response} = this.state;
 
-    // let newFeed = await [...data].concat(feed);    
+  //   // let newFeed = await [...data].concat(feed);    
 
-    // console.log(feed);
-    data.forEach( order => {
-      // Save active / inactive
-      let inactiveFound =  this.findIndex(inactiveOrders,order.id);
-      let activeFound =  this.findIndex(activeOrders,order.id);
-      console.log('sortFeed....')
-      console.log(inactiveFound, activeFound);
-      if ( ACTIVE_EVENTS.includes(order.event_name)) {
-        // add new order / update existing order
-        if (activeFound === -1) {
-          activeOrders.push(order);
-        } else {
-          activeOrders[activeFound] = order;
-        }
-      } else if ( INACTIVE_EVENTS.includes(order.event_name)) {
-        // add to inactive orders and remove from active orders
-        if (inactiveFound === -1 && activeFound > -1) {
-          // delete activeOrders[order.id];
-          activeOrders.splice(activeFound,1);
-          inactiveOrders.push(order);
-          // inactiveOrders[order.id] = order;
-        } else {
-          // do something
-        }
-      }
-    });
+  //   // console.log(feed);
+  //   data.forEach( order => {
+  //     // Save active / inactive
+  //     let inactiveFound =  this.findIndex(inactiveOrders,order.id);
+  //     let activeFound =  this.findIndex(activeOrders,order.id);
+  //     console.log('sortFeed....')
+  //     console.log(inactiveFound, activeFound);
+  //     if ( ACTIVE_EVENTS.includes(order.event_name)) {
+  //       // add new order / update existing order
+  //       if (activeFound === -1) {
+  //         activeOrders.push(order);
+  //       } else {
+  //         activeOrders[activeFound] = order;
+  //       }
+  //     } else if ( INACTIVE_EVENTS.includes(order.event_name)) {
+  //       // add to inactive orders and remove from active orders
+  //       if (inactiveFound === -1 && activeFound > -1) {
+  //         // delete activeOrders[order.id];
+  //         activeOrders.splice(activeFound,1);
+  //         inactiveOrders.push(order);
+  //         // inactiveOrders[order.id] = order;
+  //       } else {
+  //         // do something
+  //       }
+  //     }
+  //   });
 
-    let feed = await [...response].concat(...data);
-    await feed.sort( (a,b) =>  b.sent_at_second - a.sent_at_second);
+  //   let feed = await [...response].concat(...data);
+  //   await feed.sort( (a,b) =>  b.sent_at_second - a.sent_at_second);
 
-    this.setState({ response: response.concat(...data), activeOrders: activeOrders.sort( (a,b) =>  b.sent_at_second - a.sent_at_second), inactiveOrders: inactiveOrders.sort( (a,b) =>  b.sent_at_second - a.sent_at_second), timeElapsed: sec});
-  }
+  //   this.setState({ response: response.concat(...data), activeOrders: activeOrders.sort( (a,b) =>  b.sent_at_second - a.sent_at_second), inactiveOrders: inactiveOrders.sort( (a,b) =>  b.sent_at_second - a.sent_at_second), timeElapsed: sec});
+  // }
   
   render() {
     const { classes } = this.props;
@@ -219,7 +236,7 @@ class App extends Component {
 
     // const feed = response.reverse();
     
-    // const feed = response ? response.map( (e) => {
+    // const feed = this.order.length >0  ? this.order.map( (e) => {
     //     return (
     //     <div key={`${e.id}-${e.event_name}-${e.sent_at_second}`}>
     //       <div>{e.id}</div>
@@ -231,27 +248,27 @@ class App extends Component {
     //     )}) : '';
     
 
-    const activeList = activeOrders ? activeOrders.map( (e) => {
-      return (
-        <div key={`${e.id}-${e.event_name}-${e.sent_at_second}`}>
-          <p>Order Id: {e.id}</p>
-          <p>Order Item: {e.name}</p>
-          <p>Status: {e.event_name}</p>
-          <p>Destination: {e.destination}</p>
-          <p>TimeStamp: {e.sent_at_second}</p>
-        </div>
-      )}) : '';
+    // const activeList = activeOrders ? activeOrders.map( (e) => {
+    //   return (
+    //     <div key={`${e.id}-${e.event_name}-${e.sent_at_second}`}>
+    //       <p>Order Id: {e.id}</p>
+    //       <p>Order Item: {e.name}</p>
+    //       <p>Status: {e.event_name}</p>
+    //       <p>Destination: {e.destination}</p>
+    //       <p>TimeStamp: {e.sent_at_second}</p>
+    //     </div>
+    //   )}) : '';
 
-    const inactiveList = inactiveOrders ? inactiveOrders.map( (e) => {
-      return (
-        <div key={`${e.id}-${e.event_name}-${e.sent_at_second}`}>
-          <p>Order Id: {e.id}</p>
-          <p>Order Item: {e.name}</p>
-          <p>Status: {e.event_name}</p>
-          <p>Destination: {e.destination}</p>
-          <p>TimeStamp: {e.sent_at_second}</p>
-      </div>
-      )}) : '';
+    // const inactiveList = inactiveOrders ? inactiveOrders.map( (e) => {
+    //   return (
+    //     <div key={`${e.id}-${e.event_name}-${e.sent_at_second}`}>
+    //       <p>Order Id: {e.id}</p>
+    //       <p>Order Item: {e.name}</p>
+    //       <p>Status: {e.event_name}</p>
+    //       <p>Destination: {e.destination}</p>
+    //       <p>TimeStamp: {e.sent_at_second}</p>
+    //   </div>
+    //   )}) : '';
 
       return (
         <div className={classes.root}>
@@ -295,6 +312,7 @@ class App extends Component {
           <main className={classes.content}>
             <div className={classes.appBarSpacer} />
             <Container maxWidth="false" className={classes.container}>
+
               <Grid container spacing={3}>
                 {/* Chart */}
                 {/* <Grid item xs={12} md={8} lg={9}>
@@ -323,7 +341,7 @@ class App extends Component {
                 {/* Recent Orders */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
-                    <Orders title='Order History' feed={response} />
+                    <Orders title='Order History' feed={response.reverse()} />
                   </Paper>
                 </Grid>
               </Grid>

@@ -14,15 +14,6 @@ import Title from './Title';
 function createData(id, date, name, shipTo, paymentMethod, amount) {
   return { id, date, name, shipTo, paymentMethod, amount };
 }
-
-const rows = [
-  createData(0, '16 Mar, 2019', 'Elvis Presley', 'Tupelo, MS', 'VISA ⠀•••• 3719', 312.44),
-  createData(1, '16 Mar, 2019', 'Paul McCartney', 'London, UK', 'VISA ⠀•••• 2574', 866.99),
-  createData(2, '16 Mar, 2019', 'Tom Scholz', 'Boston, MA', 'MC ⠀•••• 1253', 100.81),
-  createData(3, '16 Mar, 2019', 'Michael Jackson', 'Gary, IN', 'AMEX ⠀•••• 2000', 654.39),
-  createData(4, '15 Mar, 2019', 'Bruce Springsteen', 'Long Branch, NJ', 'VISA ⠀•••• 5919', 212.79),
-];
-
 const useStyles = makeStyles(theme => ({
   seeMore: {
     marginTop: theme.spacing(3),
@@ -32,24 +23,25 @@ const useStyles = makeStyles(theme => ({
 export default function Orders(props) {
   const classes = useStyles();
   console.log(props);
-  const { feed, title } = props;
+  const { feed, title, filterBy } = props;
 
   return (
-    <React.Fragment>
+    <div style={{minHeight: '300px'}}>
       <Title>{title}</Title>
-      <Table size="small">
+      {/* <div onClick={filterBy('CREATED')}>Filter Created</div> */}
+      {feed.length > 0 ? <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
             <TableCell>Item Name</TableCell>
             <TableCell>Status</TableCell>
-            <TableCell>TimeStamp</TableCell>
+            <TableCell style={{width:'20px'}}>TimeStamp</TableCell>
             <TableCell align="right">Address</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody stripedRows>
           {feed.map(row => (
-            <TableRow key={row.id}>
+            <TableRow key={`${row.id}-${row.name}-${row.sent_at_second}`}>
               <TableCell>{row.id}</TableCell>
               <TableCell>{row.name}</TableCell>
               <TableCell>{row.event_name}</TableCell>
@@ -58,12 +50,17 @@ export default function Orders(props) {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </Table> :
+    
+        <div>No orders in queue</div>
+    
+      }
+      
       {/* <div className={classes.seeMore}>
         <Link color="primary" href="javascript:;">
           See more orders
         </Link>
       </div> */}
-    </React.Fragment>
+    </div>
   );
 }

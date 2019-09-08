@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "redux-saga": "^1.0.5",
     "socket.io": "^2.2.0"
   }
 }

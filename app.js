@@ -54,34 +54,3 @@ io.on("connection", socket => {
 
 // Socket listener
 server.listen(port, () => console.log(`Listening on port ${port}`));
-
-
-
-
-
-
-// data.forEach( i => {
-//   setInterval( () => {
-//     console.log(i.sent_at_second);
-//     console.log(i);
-//     socket.emit('FromAPI', i )
-//   } , parseInt(i.sent_at_second) )
-// })
-
-
-
-// const getApiAndEmit = async socket => {
-//   try {
-//     const nextEventSecond = pdata[0].sent_at_second;
-//     if (nextEvent.sent_at_second === )
-
-    
-    
-//     // const res = await axios.get(
-//     //   "https://api.darksky.net/forecast/PUT_YOUR_API_KEY_HERE/43.7695,11.2558"
-//     // ); // Getting the data from DarkSky
-//     socket.emit("FromAPI", res.data.currently.temperature); // Emitting a new message. It will be consumed by the client
-//   } catch (error) {
-//     console.error(`Error: ${error.code}`);
-//   }
-// };
